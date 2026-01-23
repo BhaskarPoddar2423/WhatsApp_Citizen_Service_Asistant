@@ -43,7 +43,7 @@ export const CitizenInfoCard: React.FC<CitizenInfoCardProps> = ({ citizen }) => 
 
             <div className="citizen-card__details">
                 <div className="citizen-card__row">
-                    <span className="citizen-card__icon">📱</span>
+                    <span className="citizen-card__icon">P</span>
                     <div className="citizen-card__info">
                         <span className="citizen-card__label">Phone</span>
                         <span className="citizen-card__value">{citizen.phone || 'Not provided'}</span>
@@ -51,7 +51,7 @@ export const CitizenInfoCard: React.FC<CitizenInfoCardProps> = ({ citizen }) => 
                 </div>
 
                 <div className="citizen-card__row">
-                    <span className="citizen-card__icon">💬</span>
+                    <span className="citizen-card__icon">W</span>
                     <div className="citizen-card__info">
                         <span className="citizen-card__label">WhatsApp</span>
                         <span className="citizen-card__value">{citizen.whatsapp_number || 'Not provided'}</span>
@@ -59,7 +59,7 @@ export const CitizenInfoCard: React.FC<CitizenInfoCardProps> = ({ citizen }) => 
                 </div>
 
                 <div className="citizen-card__row">
-                    <span className="citizen-card__icon">📍</span>
+                    <span className="citizen-card__icon">A</span>
                     <div className="citizen-card__info">
                         <span className="citizen-card__label">Address</span>
                         <span className="citizen-card__value">{citizen.address || 'Not provided'}</span>
@@ -67,7 +67,7 @@ export const CitizenInfoCard: React.FC<CitizenInfoCardProps> = ({ citizen }) => 
                 </div>
 
                 <div className="citizen-card__row">
-                    <span className="citizen-card__icon">📊</span>
+                    <span className="citizen-card__icon">T</span>
                     <div className="citizen-card__info">
                         <span className="citizen-card__label">Total Requests</span>
                         <span className="citizen-card__value">{citizen.total_requests ?? 0}</span>
@@ -77,7 +77,7 @@ export const CitizenInfoCard: React.FC<CitizenInfoCardProps> = ({ citizen }) => 
 
             {citizen.risk_flags && citizen.risk_flags.length > 0 && (
                 <div className="citizen-card__flags">
-                    <span className="citizen-card__flags-title">⚠️ Risk Flags</span>
+                    <span className="citizen-card__flags-title">Risk Flags</span>
                     <div className="citizen-card__flags-list">
                         {citizen.risk_flags.map((flag, index) => (
                             <span key={index} className="citizen-card__flag">

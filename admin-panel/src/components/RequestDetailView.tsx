@@ -166,7 +166,7 @@ export const RequestDetailView: React.FC = () => {
             {/* Validation Errors */}
             {panelResponse.validation_errors.length > 0 && (
                 <div className="request-detail__errors">
-                    <h4>⚠️ Validation Errors</h4>
+                    <h4>Validation Errors</h4>
                     <ul>
                         {panelResponse.validation_errors.map((error, i) => (
                             <li key={i}>{error}</li>
@@ -226,9 +226,9 @@ export const RequestDetailView: React.FC = () => {
                     {/* Category Specific */}
                     <div className="request-detail__section">
                         <h3 className="section-title">
-                            {request.category === 'complaint' && '🚨 Complaint Details'}
-                            {request.category === 'certificate' && '📄 Certificate Details'}
-                            {request.category === 'payment' && '💰 Payment Details'}
+                            {request.category === 'complaint' && 'Complaint Details'}
+                            {request.category === 'certificate' && 'Certificate Details'}
+                            {request.category === 'payment' && 'Payment Details'}
                         </h3>
                         <div className="category-specific">
                             {request.category === 'complaint' && (
@@ -325,7 +325,7 @@ export const RequestDetailView: React.FC = () => {
                     {/* Attachments */}
                     {request.attachments && request.attachments.length > 0 && (
                         <div className="request-detail__section">
-                            <h3 className="section-title">📎 Attachments</h3>
+                            <h3 className="section-title">Attachments</h3>
                             <div className="attachments-list">
                                 {request.attachments.map((attachment) => (
                                     <a
@@ -335,7 +335,12 @@ export const RequestDetailView: React.FC = () => {
                                         rel="noopener noreferrer"
                                         className="attachment-item"
                                     >
-                                        <span className="attachment-icon">📄</span>
+                                        <span className="attachment-icon">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                <polyline points="14,2 14,8 20,8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                            </svg>
+                                        </span>
                                         <span className="attachment-name">{attachment.name}</span>
                                         <span className="attachment-size">
                                             {(attachment.size / 1024).toFixed(1)} KB

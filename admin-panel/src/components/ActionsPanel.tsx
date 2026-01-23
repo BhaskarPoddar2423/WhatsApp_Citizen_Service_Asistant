@@ -60,7 +60,7 @@ export const ActionsPanel: React.FC<ActionsPanelProps> = ({
         return (
             <div className="actions-panel actions-panel--disabled">
                 <p className="actions-panel__notice">
-                    🔒 You have view-only access. Contact an administrator for action permissions.
+                    You have view-only access. Contact an administrator for action permissions.
                 </p>
             </div>
         );
@@ -129,7 +129,7 @@ export const ActionsPanel: React.FC<ActionsPanelProps> = ({
             {actions.can_escalate && (
                 <div className="actions-panel__section">
                     <button className="actions-panel__btn actions-panel__btn--warning" disabled={isUpdating}>
-                        ⬆️ Escalate Request
+                        Escalate Request
                     </button>
                 </div>
             )}
@@ -137,7 +137,7 @@ export const ActionsPanel: React.FC<ActionsPanelProps> = ({
             {actions.can_transfer && (
                 <div className="actions-panel__section">
                     <button className="actions-panel__btn actions-panel__btn--secondary" disabled={isUpdating}>
-                        🔀 Transfer Department
+                        Transfer Department
                     </button>
                 </div>
             )}

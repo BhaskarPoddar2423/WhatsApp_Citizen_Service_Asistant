@@ -13,7 +13,6 @@ import { delay } from '../utils/helpers';
 
 // Import notification service
 import { getUnreadNotifications, markAsRead } from '../services/notificationService';
-import type { Notification } from '../services/notificationService';
 
 export const ChatWindow: React.FC = () => {
     const [messages, setMessages] = useState<Message[]>([]);
@@ -141,12 +140,7 @@ export const ChatWindow: React.FC = () => {
         handleSendMessage(action);
     };
 
-    const handleClearChat = () => {
-        const welcome = getWelcomeMessage();
-        setMessages([welcome]);
-        setContext({ currentFlow: 'idle' });
-        setShowQuickActions(true);
-    };
+
 
     return (
         <div className="chat-main">

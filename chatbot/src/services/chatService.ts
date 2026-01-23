@@ -3,7 +3,7 @@
 import type { Message, ConversationContext, StructuredData } from '../types';
 import { sendToGemini, hasValidApiKey } from './geminiService';
 import { createGrievance, getGrievance } from './grievanceService';
-import { createApplication, getApplication } from './applicationService';
+import { getApplication } from './applicationService';
 import { getBill, formatBillDetails, generatePaymentLink } from './billService';
 import { generateMessageId, parseStructuredData } from '../utils/helpers';
 import { WELCOME_MESSAGE } from '../utils/prompts';
