@@ -430,55 +430,25 @@ Type the certificate name for detailed steps and documents required.
         };
     }
 
-    // Status tracking
+    // Status tracking - fetch real data
     if (msg.includes('status') || msg.includes('track') || msg.match(/gr\d{5}/i) || msg.match(/app\d{5}/i)) {
         const grMatch = msg.match(/gr(\d{5})/i);
         const appMatch = msg.match(/app(\d{5})/i);
 
         if (grMatch) {
             const id = `GR${grMatch[1]}`;
+            // Return structured data to trigger real lookup in chatService
             return {
-                message: `🔍 *Grievance Status: ${id}*
-
-📋 *Category:* Roads / Potholes
-📍 *Location:* Ward 5, Near Gandhi Chowk
-📅 *Filed on:* 20 Dec 2024
-
-*Current Status:* 🟡 In Progress
-
-*Updates:*
-• 22 Dec: Assigned to Roads Department
-• 23 Dec: Field inspection scheduled
-• 24 Dec: Repair work initiated
-
-Expected completion: 26 Dec 2024
-
-_[Demo Data - Connect Supabase for real tracking]_`,
+                message: `🔍 Looking up grievance **${id}**...`,
                 structuredData: { type: 'status_query', grievance_id: id }
             };
         }
 
         if (appMatch) {
             const id = `APP${appMatch[1]}`;
+            // Return structured data to trigger real lookup in chatService
             return {
-                message: `🔍 *Application Status: ${id}*
-
-📋 *Type:* Birth Certificate
-👤 *Applicant:* Demo User
-📅 *Applied on:* 18 Dec 2024
-
-*Current Status:* 🟡 Under Review
-
-*Progress:*
-✅ Application Received
-✅ Documents Verified
-🔄 Under Review
-⏳ Approval Pending
-⏳ Ready for Collection
-
-Expected completion: 28 Dec 2024
-
-_[Demo Data - Connect Supabase for real tracking]_`,
+                message: `🔍 Looking up application **${id}**...`,
                 structuredData: { type: 'status_query', application_id: id }
             };
         }

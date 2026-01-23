@@ -100,44 +100,93 @@ function getDepartmentForCategory(category: string): string {
 }
 
 /**
- * Get grievance by ID
+ * Get grievance by ID - queries service_requests table
  */
 export async function getGrievance(grievance_id: string): Promise<Grievance | null> {
-    if (isDemoMode) {
-        const grievance = demoGrievances.get(grievance_id);
-        if (grievance) return grievance;
+    // First check demo storage
+    const demoGrievance = demoGrievances.get(grievance_id);
+    if (demoGrievance) return demoGrievance;
 
-        // Return mock data for demo
-        return {
-            id: 1,
-            grievance_id,
-            citizen_id: 'demo-citizen',
-            category: 'Roads',
-            subcategory: 'Pothole',
-            description: 'Large pothole near main market',
-            location: 'Ward 5, Main Road',
-            landmark: 'Near SBI Bank',
-            status: 'In Progress',
-            created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-            updated_at: new Date().toISOString(),
-            assigned_department: 'Roads Department',
-            notes: 'Field team scheduled for inspection'
-        };
+    if (isDemoMode) {
+        // Return null in demo mode if not found in local storage
+        // This allows the UI to show "not found" instead of fake data
+        return null;
     }
 
     try {
+        // Query service_requests table where grievance_id is stored in metadata
         const { data, error } = await supabase
-            .from('grievances')
+            .from('service_requests')
             .select('*')
-            .eq('grievance_id', grievance_id)
+            .contains('metadata', { grievance_id: grievance_id })
             .single();
 
-        if (error) throw error;
-        return data;
+        if (error) {
+            console.error('Error fetching grievance from service_requests:', error);
+            // Try alternate query using the ID directly
+            const { data: altData, error: altError } = await supabase
+                .from('service_requests')
+                .select('*')
+                .eq('id', grievance_id.replace(/^GR/i, ''))
+                .single();
+
+            if (altError) {
+                console.error('Alternate query also failed:', altError);
+                return null;
+            }
+
+            if (altData) {
+                return transformServiceRequestToGrievance(altData);
+            }
+            return null;
+        }
+
+        if (data) {
+            return transformServiceRequestToGrievance(data);
+        }
+        return null;
     } catch (error) {
         console.error('Error fetching grievance:', error);
         return null;
     }
+}
+
+/**
+ * Transform service_request record to Grievance type
+ */
+function transformServiceRequestToGrievance(record: Record<string, unknown>): Grievance {
+    const metadata = (record.metadata as Record<string, unknown>) || {};
+    return {
+        id: record.id as number,
+        grievance_id: (metadata.grievance_id as string) || `GR${String(record.id).padStart(5, '0')}`,
+        citizen_id: record.citizen_id as string,
+        category: record.sub_category as string || record.category as string,
+        subcategory: metadata.problem_type as string,
+        description: record.description as string,
+        location: metadata.location as string || 'Not specified',
+        landmark: metadata.landmark as string,
+        status: mapStatusToGrievanceStatus(record.status as string),
+        created_at: record.created_at as string,
+        updated_at: record.updated_at as string,
+        assigned_department: record.department as string,
+        notes: metadata.notes as string
+    };
+}
+
+/**
+ * Map service_request status to grievance status
+ */
+function mapStatusToGrievanceStatus(status: string): GrievanceStatus {
+    const statusMap: Record<string, GrievanceStatus> = {
+        'new': 'New',
+        'in_progress': 'In Progress',
+        'under_review': 'Under Review',
+        'resolved': 'Resolved',
+        'closed': 'Closed',
+        'rejected': 'Rejected',
+        'pending': 'New' // Map pending to New
+    };
+    return statusMap[status?.toLowerCase()] || 'New';
 }
 
 /**
