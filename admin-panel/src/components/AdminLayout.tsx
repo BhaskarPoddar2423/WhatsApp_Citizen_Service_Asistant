@@ -101,6 +101,14 @@ export const AdminLayout: React.FC = () => {
                         Dashboard
                     </NavLink>
                     <NavLink
+                        to="/analytics"
+                        className={({ isActive }) =>
+                            `admin-nav-link ${isActive ? 'admin-nav-link--active' : ''}`
+                        }
+                    >
+                        Analytics
+                    </NavLink>
+                    <NavLink
                         to="/notifications"
                         className={({ isActive }) =>
                             `admin-nav-link ${isActive ? 'admin-nav-link--active' : ''}`

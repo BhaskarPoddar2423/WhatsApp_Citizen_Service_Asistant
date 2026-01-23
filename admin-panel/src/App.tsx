@@ -8,6 +8,7 @@ import { AdminLayout } from './components/AdminLayout';
 import { RequestDashboard } from './components/RequestDashboard';
 import { RequestDetailView } from './components/RequestDetailView';
 import { NotificationsPage } from './pages/NotificationsPage';
+import { AnalyticsPage } from './pages/AnalyticsPage';
 import './index.css';
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
                     >
                         <Route index element={<RequestDashboard />} />
                         <Route path="request/:id" element={<RequestDetailView />} />
+                        <Route path="analytics" element={<AnalyticsPage />} />
                         <Route path="notifications" element={<NotificationsPage />} />
                     </Route>
 
