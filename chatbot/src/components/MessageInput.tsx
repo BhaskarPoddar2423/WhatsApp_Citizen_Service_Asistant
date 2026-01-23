@@ -77,11 +77,60 @@ const ContactIcon = () => (
     </svg>
 );
 
+
+
+// Web Speech API Type Definitions
+interface SpeechRecognitionEvent extends Event {
+    results: SpeechRecognitionResultList;
+    resultIndex: number;
+}
+
+interface SpeechRecognitionResultList {
+    length: number;
+    item(index: number): SpeechRecognitionResult;
+    [index: number]: SpeechRecognitionResult;
+}
+
+interface SpeechRecognitionResult {
+    isFinal: boolean;
+    length: number;
+    item(index: number): SpeechRecognitionAlternative;
+    [index: number]: SpeechRecognitionAlternative;
+}
+
+interface SpeechRecognitionAlternative {
+    transcript: string;
+    confidence: number;
+}
+
+interface SpeechRecognition extends EventTarget {
+    continuous: boolean;
+    interimResults: boolean;
+    lang: string;
+    start(): void;
+    stop(): void;
+    abort(): void;
+    onresult: (event: SpeechRecognitionEvent) => void;
+    onerror: (event: any) => void;
+    onend: () => void;
+}
+
+declare global {
+    interface Window {
+        SpeechRecognition: { new(): SpeechRecognition };
+        webkitSpeechRecognition: { new(): SpeechRecognition };
+    }
+}
+
 export const MessageInput: React.FC<MessageInputProps> = ({ onSend, disabled = false }) => {
     const [message, setMessage] = useState('');
+    const [interimTranscript, setInterimTranscript] = useState('');
     const [showAttachmentMenu, setShowAttachmentMenu] = useState(false);
+    const [isRecording, setIsRecording] = useState(false);
+
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const attachmentRef = useRef<HTMLDivElement>(null);
+    const recognitionRef = useRef<SpeechRecognition | null>(null);
 
     // Auto-resize textarea
     useEffect(() => {
@@ -89,7 +138,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({ onSend, disabled = f
             textareaRef.current.style.height = 'auto';
             textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
         }
-    }, [message]);
+    }, [message, interimTranscript]);
 
     // Close attachment menu when clicking outside
     useEffect(() => {
@@ -100,7 +149,12 @@ export const MessageInput: React.FC<MessageInputProps> = ({ onSend, disabled = f
         };
 
         document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            if (recognitionRef.current) {
+                recognitionRef.current.stop();
+            }
+        };
     }, []);
 
     const handleSubmit = (e?: React.FormEvent) => {
@@ -109,6 +163,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({ onSend, disabled = f
         if (trimmedMessage && !disabled) {
             onSend(trimmedMessage);
             setMessage('');
+            setInterimTranscript('');
             if (textareaRef.current) {
                 textareaRef.current.style.height = 'auto';
             }
@@ -130,6 +185,69 @@ export const MessageInput: React.FC<MessageInputProps> = ({ onSend, disabled = f
         console.log(`Selected attachment type: ${type}`);
         setShowAttachmentMenu(false);
         // TODO: Implement actual file handling
+    };
+
+    // Dictation Logic (Speech-to-Text)
+    const toggleRecording = () => {
+        if (isRecording) {
+            stopRecording();
+        } else {
+            startRecording();
+        }
+    };
+
+    const startRecording = () => {
+        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+        if (!SpeechRecognition) {
+            alert("Your browser doesn't support speech recognition.");
+            return;
+        }
+
+        const recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = 'en-US';
+
+        recognition.onresult = (event: SpeechRecognitionEvent) => {
+            let interim = '';
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) {
+                    setMessage(prev => {
+                        const prefix = prev.trim() ? (prev.endsWith(' ') ? prev : prev + ' ') : '';
+                        return prefix + event.results[i][0].transcript;
+                    });
+                    setInterimTranscript('');
+                } else {
+                    interim += event.results[i][0].transcript;
+                }
+            }
+            setInterimTranscript(interim);
+        };
+
+        recognition.onerror = (event: any) => {
+            console.error('Speech recognition error', event.error);
+            setIsRecording(false);
+            setInterimTranscript('');
+        };
+
+        recognition.onend = () => {
+            setIsRecording(false);
+            setInterimTranscript('');
+        };
+
+        recognitionRef.current = recognition;
+        recognition.start();
+        setIsRecording(true);
+    };
+
+    const stopRecording = () => {
+        if (recognitionRef.current) {
+            recognitionRef.current.stop();
+            recognitionRef.current = null;
+        }
+        setIsRecording(false);
+        setInterimTranscript('');
     };
 
     return (
@@ -176,8 +294,8 @@ export const MessageInput: React.FC<MessageInputProps> = ({ onSend, disabled = f
                 <textarea
                     ref={textareaRef}
                     className="message-input"
-                    placeholder="Type a message"
-                    value={message}
+                    placeholder={isRecording ? "Listening..." : "Type a message"}
+                    value={message + interimTranscript}
                     onChange={(e) => setMessage(e.target.value)}
                     onKeyDown={handleKeyDown}
                     disabled={disabled}
@@ -186,17 +304,31 @@ export const MessageInput: React.FC<MessageInputProps> = ({ onSend, disabled = f
             </div>
 
             {/* Send or Microphone Button */}
-            {message.trim() ? (
-                <button
-                    className="send-btn"
-                    onClick={() => handleSubmit()}
-                    disabled={disabled}
-                    title="Send message"
-                >
-                    <SendIcon />
-                </button>
+            {(message.trim() || isRecording) ? (
+                isRecording ? (
+                    <button
+                        className="mic-btn recording"
+                        title="Stop recording"
+                        onClick={toggleRecording}
+                    >
+                        <MicIcon />
+                    </button>
+                ) : (
+                    <button
+                        className="send-btn"
+                        onClick={() => handleSubmit()}
+                        disabled={disabled}
+                        title="Send message"
+                    >
+                        <SendIcon />
+                    </button>
+                )
             ) : (
-                <button className="mic-btn" title="Voice message">
+                <button
+                    className="mic-btn"
+                    title="Voice message"
+                    onClick={toggleRecording}
+                >
                     <MicIcon />
                 </button>
             )}

@@ -801,6 +801,123 @@ body {
     transition: all 0.15s;
 }
 
+.send-btn:hover {
+    color: var(--wa-text-primary);
+}
+
+.send-btn svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+}
+
+/* Recording UI */
+.recording-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 10px;
+}
+
+.recording-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.recording-dot {
+    width: 10px;
+    height: 10px;
+    background-color: #ff3b30;
+    border-radius: 50%;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.4;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.recording-timer {
+    font-size: 16px;
+    color: var(--wa-text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+.slide-to-cancel {
+    color: var(--wa-text-secondary);
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    animation: slideText 2s infinite;
+}
+
+@keyframes slideText {
+    0% {
+        transform: translateX(0);
+        opacity: 0.5;
+    }
+
+    50% {
+        transform: translateX(-5px);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateX(0);
+        opacity: 0.5;
+    }
+}
+
+.cancel-btn {
+    color: #ff3b30;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.cancel-btn:hover {
+    background-color: rgba(255, 59, 48, 0.1);
+}
+
+.mic-btn.recording {
+    color: white;
+    background-color: var(--wa-teal);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(0, 168, 132, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(0, 168, 132, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(0, 168, 132, 0);
+    }
+}
+
+
 .send-btn:hover:not(:disabled) {
     color: var(--wa-text-primary);
 }
